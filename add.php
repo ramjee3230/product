@@ -6,6 +6,7 @@ include "dbconnect.php";
 if (isset($_POST["submit"])) {
     //resive data form post method
     //and store in variable
+    
     $product_name = $_POST['product_name'];
     $price = $_POST['price'];
     $quantity = $_POST['quantity'];
@@ -21,7 +22,7 @@ if (isset($_POST["submit"])) {
         $errors[] = "Price is required";
     }
     //validation for quntity
-    if (empty($quantity) || !is_numeric($quantity) || $quantity <= 0 ||$quantity>=100) {
+    if (empty($quantity) || !is_numeric($quantity) || $quantity <= 0 || $quantity>=100) {
         $errors[] = "Quantity is required";
     }
     //validation for category
