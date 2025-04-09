@@ -26,8 +26,7 @@ if (isset($_POST["submit"])) {
         $check_sql_result = mysqli_query($conn, $check_sql);
 
         if (mysqli_num_rows($check_sql_result) > 0) {
-            $errors[] = "Product already exists";
-        
+            $errors[] = "Product already exists";       
         } else {
             
             $sql = "INSERT INTO `product_list` (`id`, `product_name`, `price`, `quantity`, `category`) VALUES (NULL, '$product_name', '$price', '$quantity', '$category');";
