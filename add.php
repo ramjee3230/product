@@ -1,39 +1,51 @@
 <?php
+// include database connection file
 include "dbconnect.php";
+//check form submitted
 
 if (isset($_POST["submit"])) {
+    //resive data form post method
+    //and store in variable
     $product_name = $_POST['product_name'];
     $price = $_POST['price'];
     $quantity = $_POST['quantity'];
     $category = $_POST['category'];
 
     $errors = [];
+    //vslidatin product name
     if (empty($product_name)) {
         $errors[] = "Product Name is required";
     }
+    //validation for price
     if (empty($price) || !is_numeric($price) || $price <= 0) {
         $errors[] = "Price is required";
     }
-    if (empty($quantity) || !is_numeric($quantity) || $quantity <= 0) {
+    //validation for quntity
+    if (empty($quantity) || !is_numeric($quantity) || $quantity <= 0 ||$quantity>=100) {
         $errors[] = "Quantity is required";
     }
+    //validation for category
     if (empty($category)) {
         $errors[] = "Category is required";
     }
     if (empty($errors)) {
-
+        //chech if product name alreaddy exists in database 
         $check_sql = "SELECT * FROM `product_list` WHERE product_name='$product_name'";
         $check_sql_result = mysqli_query($conn, $check_sql);
 
         if (mysqli_num_rows($check_sql_result) > 0) {
-            $errors[] = "Product already exists";       
+            //error for data match
+            $errors[] = "Product already exists";
         } else {
-            
-            $sql = "INSERT INTO `product_list` (`id`, `product_name`, `price`, `quantity`, `category`) VALUES (NULL, '$product_name', '$price', '$quantity', '$category');";
+            //insert new data in database
 
+            $sql = "INSERT INTO `product_list` (`id`, `product_name`, `price`, `quantity`, `category`) VALUES (NULL, '$product_name', '$price', '$quantity', '$category');";
+            //execute query
             $result = mysqli_query($conn, $sql);
 
             if ($result) {
+                //if data inserted successfully and index.php page open
+                //and show success message
                 header("Location: index.php?msg=New record created successfully");
                 exit();
             } else {
@@ -53,7 +65,9 @@ if (isset($_POST["submit"])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Bootstrap -->
+    <!-- Bootstrap and css -->
+    <link rel="stylesheet" href="style.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
     <!-- Font Awesome -->
@@ -63,8 +77,9 @@ if (isset($_POST["submit"])) {
 </head>
 
 <body>
+    <!-- navbar for product -->
     <nav class="navbar navbar-light justify-content-center fs-3 mb-5" style="background-color:rgba(32, 193, 218, 0.45);">
-        PHP Complete CRUD Application - Product
+        PHP CRUD Application - Product
     </nav>
 
     <div class="container">
@@ -75,7 +90,7 @@ if (isset($_POST["submit"])) {
 
         <div class="container d-flex justify-content-center">
             <form action="" method="post" style="width:50vw; min-width:300px;">
-
+                <!--- display validation error -->
                 <?php if (!empty($errors)) { ?>
                     <div class="alert alert-danger">
                         <ul>
@@ -86,6 +101,7 @@ if (isset($_POST["submit"])) {
                     </div>
                 <?php } ?>
 
+                <!-- product name, price, quantity and category form -->
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label">Product Name:</label>
@@ -111,6 +127,7 @@ if (isset($_POST["submit"])) {
                     </div>
                 </div>
                 <div>
+                            <!-- form submit and cancel button -->
                     <button type="submit" class="btn btn-success" name="submit">Save</button>
                     <a href="index.php" class="btn btn-danger">Cancel</a>
                 </div>
@@ -118,7 +135,7 @@ if (isset($_POST["submit"])) {
         </div>
     </div>
 
-    <!-- Bootstrap -->
+    <!-- Bootstrap js link -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 
 </body>
