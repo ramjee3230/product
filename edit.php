@@ -128,6 +128,7 @@ if (isset($_POST["submit"])) {
                             <input type="text" class="form-control" placeholder="Enter Price" name="price" value="<?php echo $row['price'] ?>">
                             <span class="input-group-text">$</span>
                         </div>
+
                     </div>
                 </div>
                 <div class="mb-3 row">
