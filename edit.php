@@ -14,24 +14,43 @@ if (isset($_POST["submit"])) {
     $price = $_POST['price'];
     $quantity = $_POST['quantity'];
     $category = $_POST['category'];
-
     $errors = [];
     //vslidatin product name
-    if (empty($product_name)) {
-        $errors[] = "Product Name is required";
+    if ($product_name == "") {
+        $errors[] = "Please Enter Product Name";
+    }
+
+    elseif(!preg_match("/^[a-zA-Z]*$/", $product_name)) {
+        $errors[] = "Product Name must be letters only";
     }
     //validation for price
-    if (empty($price) || !is_numeric($price) || $price <= 0) {
-        $errors[] = "Price is required";
+    if (empty($price)) {
+        $errors[] = "please  Enter Price";
+    } elseif (!is_numeric($price)) {
+        $errors[] = "Price Enter must be a number between 0 and 100000";
+    } elseif ($price < 0) {
+        $errors[] = "Price must be greater than 0";
+
+    } elseif ($price > 100000) {
+        $errors[] = "Price must be less than 100000";
     }
-    //validation for quntity
-    if (empty($quantity) || !is_numeric($quantity) || $quantity <= 0) {
+    //validation for quantity
+    if (empty($quantity)    ) {
         $errors[] = "Quantity is required";
+    } elseif (!is_numeric($quantity)) {
+        $errors[] = "Quantity Enter must be a number between 0 and 100";
+    } elseif ($quantity < 0) {
+        $errors[] = "Quantity must be greater than 0";
+
+    } elseif ($quantity > 100) {
+        $errors[] = "Quantity must be less than 100";
     }
     //validation for category
-
-    if (empty($category)) {
-        $errors[] = "Category is required";
+    if ($category == "") {
+        $errors[] = "Please Enter Category ";
+    }
+    if (!preg_match("/^[a-zA-Z ,]*$/", $category)) {
+        $errors[] = "Category must be letters only";
     }
 
     if (empty($errors)) {

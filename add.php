@@ -6,7 +6,6 @@ include "dbconnect.php";
 if (isset($_POST["submit"])) {
     //resive data form post method
     //and store in variable
-    
     $product_name = $_POST['product_name'];
     $price = $_POST['price'];
     $quantity = $_POST['quantity'];
@@ -14,20 +13,40 @@ if (isset($_POST["submit"])) {
 
     $errors = [];
     //vslidatin product name
-    if (empty($product_name)) {
-        $errors[] = "Product Name is required";
+    if ($product_name == "") {
+        $errors[] = "Please Enter Product Name";
+    }
+    elseif(!preg_match("/^[a-zA-Z]*$/", $product_name)) {
+        $errors[] = "Product Name must be letters only";
     }
     //validation for price
-    if (empty($price) || !is_numeric($price) || $price <= 0) {
-        $errors[] = "Price is required";
+    if (empty($price)) {
+        $errors[] = "please  Enter Price";
+    } elseif (!is_numeric($price)) {
+        $errors[] = "Price Enter must be a number between 0 and 100000";
+    } elseif ($price < 0) {
+        $errors[] = "Price must be greater than 0";
+
+    } elseif ($price > 100000) {
+        $errors[] = "Price must be less than 100000";
     }
-    //validation for quntity
-    if (empty($quantity) || !is_numeric($quantity) || $quantity <= 0 || $quantity>=100) {
+    //validation for quantity
+    if (empty($quantity)    ) {
         $errors[] = "Quantity is required";
+    } elseif (!is_numeric($quantity)) {
+        $errors[] = "Quantity Enter must be a number between 0 and 100";
+    } elseif ($quantity < 0) {
+        $errors[] = "Quantity must be greater than 0";
+
+    } elseif ($quantity > 100) {
+        $errors[] = "Quantity must be less than 100";
     }
     //validation for category
-    if (empty($category)) {
-        $errors[] = "Category is required";
+    if ($category == "") {
+        $errors[] = "Please Enter Category ";
+    }
+    if (!preg_match("/^[a-zA-Z ,]*$/", $category)) {
+        $errors[] = "Category must be letters only";
     }
     if (empty($errors)) {
         //chech if product name alreaddy exists in database 
@@ -38,10 +57,11 @@ if (isset($_POST["submit"])) {
             //error for data match
             $errors[] = "Product already exists";
         } else {
-            //insert new data in database
 
+            //insert new data in database
             $sql = "INSERT INTO `product_list` (`id`, `product_name`, `price`, `quantity`, `category`) VALUES (NULL, '$product_name', '$price', '$quantity', '$category');";
             //execute query
+
             $result = mysqli_query($conn, $sql);
 
             if ($result) {
@@ -87,8 +107,6 @@ if (isset($_POST["submit"])) {
         <div class="text-center mb-4">
             <h3>Add Product Deteil</h3>
         </div>
-
-
         <div class="container d-flex justify-content-center">
             <form action="" method="post" style="width:50vw; min-width:300px;">
                 <!--- display validation error -->
@@ -112,7 +130,7 @@ if (isset($_POST["submit"])) {
                     <div class="col">
                         <label class="form-label">Price:</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Enter Price" name="price">
+                            <input type="number" class="form-control" placeholder="Enter Price" name="price">
                             <span class="input-group-text">$</span>
                         </div>
                     </div>
@@ -128,7 +146,7 @@ if (isset($_POST["submit"])) {
                     </div>
                 </div>
                 <div>
-                            <!-- form submit and cancel button -->
+                    <!-- form submit and cancel button -->
                     <button type="submit" class="btn btn-success" name="submit">Save</button>
                     <a href="index.php" class="btn btn-danger">Cancel</a>
                 </div>
