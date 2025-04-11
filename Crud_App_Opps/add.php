@@ -1,81 +1,52 @@
 <?php
 // include database connection file
-include "dbconnect.php";
-//check form submitted
+include "database.php";
+
+$obj = new product();
+$validator = new Validation();
+$errors = []; // Initialize the errors array
 
 if (isset($_POST["submit"])) {
-    //resive data form post method
-    //and store in variable
-    $product_name = $_POST['product_name'];
-    $price = $_POST['price'];
-    $quantity = $_POST['quantity'];
-    $category = $_POST['category'];
+    // Receive data from POST method and store in variables
+    $product_name = trim($_POST['product_name']);
+    $price = trim($_POST['price']);
+    $quantity = trim($_POST['quantity']);
+    $category = trim($_POST['category']);
+    $data = $_POST;
 
-    $errors = [];
-    //vslidatin product name
-    if ($product_name == "") {
-        $errors[] = "Please Enter Product Name";
-    }
-    elseif(!preg_match("/^[a-zA-Z]*$/", $product_name)) {
-        $errors[] = "Product Name must be letters only";
-    }
-    //validation for price
-    if (empty($price)) {
-        $errors[] = "please  Enter Price";
-    } elseif (!is_numeric($price)) {
-        $errors[] = "Price Enter must be a number between 0 and 100000";
-    } elseif ($price < 0) {
-        $errors[] = "Price must be greater than 0";
+    // Validate inputs using the Validation class
+    $validator->validateProductName($product_name);
+    $validator->validatePrice($price);
+    $validator->validateQuantity($quantity);
+    $validator->validateCategory($category);
 
-    } elseif ($price > 100000) {
-        $errors[] = "Price must be less than 100000";
-    }
-    //validation for quantity
-    if (empty($quantity)    ) {
-        $errors[] = "Quantity is required";
-    } elseif (!is_numeric($quantity)) {
-        $errors[] = "Quantity Enter must be a number between 0 and 100";
-    } elseif ($quantity < 0) {
-        $errors[] = "Quantity must be greater than 0";
+    // Get validation errors
+    
+    $errors = $validator->getErrors();
 
-    } elseif ($quantity > 100) {
-        $errors[] = "Quantity must be less than 100";
-    }
-    //validation for category
-    if ($category == "") {
-        $errors[] = "Please Enter Category ";
-    }
-    if (!preg_match("/^[a-zA-Z ,]*$/", $category)) {
-        $errors[] = "Category must be letters only";
-    }
     if (empty($errors)) {
-        //chech if product name alreaddy exists in database 
+        // Check if product name already exists in the database
         $check_sql = "SELECT * FROM `product_list` WHERE product_name='$product_name'";
-        $check_sql_result = mysqli_query($conn, $check_sql);
+        $check_sql_result = mysqli_query($obj->connect(), $check_sql);
 
         if (mysqli_num_rows($check_sql_result) > 0) {
-            //error for data match
-            $errors[] = "Product already exists";
+            // Error for data match
+            $errors[] = "Product already exists.";
         } else {
-            //insert new data in database
-            $sql = "INSERT INTO `product_list` (`id`, `product_name`, `price`, `quantity`, `category`) VALUES (NULL, '$product_name', '$price', '$quantity', '$category');";
-            //execute query
-            $result = mysqli_query($conn, $sql);
-
+            // Insert new data into the database
+            $result = $obj->insertdata($data);
             if ($result) {
-                //if data inserted successfully and index.php page open
-                //and show success message
+                // If data inserted successfully, redirect to index.php with success message
                 header("Location: index.php?msg=New record created successfully");
                 exit();
             } else {
-                $errors[] = "Failed: " . mysqli_error($conn);
+                $errors[] = "Failed: " . mysqli_error($obj->connect());
             }
         }
     }
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -91,7 +62,6 @@ if (isset($_POST["submit"])) {
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
     <title>PHP Complete CRUD Application - Product</title>
 </head>
 
@@ -100,7 +70,6 @@ if (isset($_POST["submit"])) {
     <nav class="navbar navbar-light justify-content-center fs-3 mb-5" style="background-color:rgba(32, 193, 218, 0.45);">
         PHP CRUD Application - Product
     </nav>
-
     <div class="container">
         <div class="text-center mb-4">
             <h3>Add Product Deteil</h3>
@@ -108,7 +77,8 @@ if (isset($_POST["submit"])) {
         <div class="container d-flex justify-content-center">
             <form action="" method="post" style="width:50vw; min-width:300px;">
                 <!--- display validation error -->
-                <?php if (!empty($errors)) { ?>
+                <?php
+                if (!empty($errors) && empty($error)) { ?>
                     <div class="alert alert-danger">
                         <ul>
                             <?php foreach ($errors as $error) { ?>
@@ -117,7 +87,6 @@ if (isset($_POST["submit"])) {
                         </ul>
                     </div>
                 <?php } ?>
-
                 <!-- product name, price, quantity and category form -->
                 <div class="row mb-3">
                     <div class="col">
@@ -154,7 +123,6 @@ if (isset($_POST["submit"])) {
 
     <!-- Bootstrap js link -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-
 </body>
 
 </html>
